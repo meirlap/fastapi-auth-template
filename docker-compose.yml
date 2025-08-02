@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  # שירות ה-Backend שלנו
+  backend:
+    build: ./backend  # תבנה את האימג' מה-Dockerfile שנמצא בתיקיית backend
+    container_name: i-park-backend
+    ports:
+      - "8000:8000"  # חשיפת פורט 8000 מהקונטיינר למחשב המארח
+    volumes:
+      - ./backend:/app  # סנכרון חי של הקוד מהמחשב לקונטיינר
+    env_file:
+      - ./backend/.env # טעינת משתני סביבה מהקובץ
+    depends_on:
+      - db  # ה-backend תלוי ב-db, ולכן יחכה שה-db יעלה קודם
+
+  # שירות בסיס הנתונים
+  db:
+    image: postgres:15-alpine # שימוש באימג' רשמי ורזה של PostgreSQL
+    container_name: i-park-db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/ # שמירת המידע של ה-DB
+    env_file:
+      - ./backend/.env # טעינת משתני סביבה מהקובץ
+    ports:
+      - "5432:5432" # חשיפת פורט ברירת המחדל של postgres (שימושי לדיבאג)
+
+volumes:
+  postgres_data: # הגדרת ה-volume ששומר את המידע
